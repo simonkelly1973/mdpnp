@@ -213,6 +213,7 @@ module ice {
     ConnectionType type;
     LongString info;
     ValidTargets valid_targets;
+    string<16> comPort;
   }; //@top-level true //@Extensibility MUTABLE_EXTENSIBILITY
   #pragma keylist DeviceConnectivity unique_device_identifier
   const string DeviceConnectivityTopic = "DeviceConnectivity";
@@ -301,6 +302,12 @@ module ice {
    * Can the device averaging rate be set through the software interface
    */
   const string SP02_SOFT_CAN_SET_AVERAGING_RATE = "SP02_SOFT_CAN_SET_AVERAGING_RATE";
+  /**
+   * A class to be used as a numeric placeholder for a respiratory rate derived by
+   * OpenICE, rather than received from a device itself.  First use is in the Draeger
+   * Apollo
+   */
+  const string ICE_DERIVED_RESPIRATORY_RATE = "ICE_DERIVED_RESPIRATORY_RATE";
 
   /**
    * Numerics are values observed by sensors at a relatively slow rate; generally <=3Hz. 
@@ -396,6 +403,23 @@ module ice {
   #pragma keylist OximetryAveragingObjective unique_device_identifier
   const string OximetryAveragingObjectiveTopic = "OximetryAveragingObjective";
 
+  /**
+   * SK - Topic for setting the flow rate in a Pump device.
+   * The "Pump Control" app will publish a sample with flowRate=N to
+   * indicate that this is the desired flow rate.  ICE compliant devices
+   * that can have their flow rate set will already be publishing their current
+   * flow rate, and so the acknowledgement will come from that parameter changing.
+   *
+   * Stability: 1 - Experimental
+  */
+  struct FlowRateObjective {
+    UniqueDeviceIdentifier unique_device_identifier; //@key
+    LongString requestor;
+    float newFlowRate;
+  }; //@top-level true //@Extensibility MUTABLE_EXTENSIBILITY
+  #pragma keylist FlowRateObjective unique_device_identifier
+  const string FlowRateObjectiveTopic = "FlowRateObjective";
+   
   /**
    * Speculative topic used for the PCA demonstration. Only currently used by infusion 
    * pump simulators. But this is meant to represent the current state of an infusion 

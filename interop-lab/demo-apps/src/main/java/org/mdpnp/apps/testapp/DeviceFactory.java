@@ -16,6 +16,7 @@ import org.mdpnp.devices.AbstractDevice;
 import org.mdpnp.devices.DeviceDriverProvider;
 import org.mdpnp.devices.DeviceDriverProvider.SpringLoadedDriver;
 import org.mdpnp.devices.cpc.bernoulli.DemoBernoulli;
+import org.mdpnp.devices.denver.mseries.MSeriesScale;
 import org.mdpnp.devices.draeger.medibus.*;
 import org.mdpnp.devices.fluke.prosim68.DemoProsim68;
 import org.mdpnp.devices.ge.serial.DemoGESerial;
@@ -38,6 +39,7 @@ import org.mdpnp.devices.simulation.pulseox.FourSecNoSoftAvgSimPulseOximeter;
 import org.mdpnp.devices.simulation.pulseox.InitialEightSecIceSettableAvgSimPulseOximeter;
 import org.mdpnp.devices.simulation.pulseox.InitialEightSecOperSettableAvgSimPulseOximeter;
 import org.mdpnp.devices.simulation.pulseox.SimPulseOximeter;
+import org.mdpnp.devices.simulation.pump.SimControllablePump;
 import org.mdpnp.devices.simulation.pump.SimInfusionPump;
 import org.mdpnp.devices.simulation.temp.SimThermometer;
 import org.mdpnp.devices.zephyr.biopatch.DemoBioPatch;
@@ -604,5 +606,41 @@ public class DeviceFactory {
 
         }        
     }
+    
+    public static class MSeriesScaleProvider extends SpringLoadedDriver {
+
+		@Override
+		public DeviceType getDeviceType() {
+			return new DeviceType(ice.ConnectionType.Serial,"Denver", "MSeries", "MSeries", 1);
+		}
+
+		@Override
+		public AbstractDevice newInstance(AbstractApplicationContext context) throws Exception {
+			EventLoop eventLoop = (EventLoop)context.getBean("eventLoop");
+            Subscriber subscriber = context.getBean("subscriber", Subscriber.class);
+            Publisher publisher = context.getBean("publisher", Publisher.class);
+            return new MSeriesScale(subscriber, publisher, eventLoop);
+		}
+    	
+    }
+
+    public static class ControllablePump_SimulatorProvider extends SpringLoadedDriver {
+    	
+    	@Override
+        public DeviceType getDeviceType() {
+                return new DeviceType(ice.ConnectionType.Simulated,"ICE", "Controllable Pump", "Controllable_PUmp", 1);
+        }
+    	
+        @Override
+        public AbstractDevice newInstance(AbstractApplicationContext context) throws Exception {
+                EventLoop eventLoop = (EventLoop)context.getBean("eventLoop");
+                Subscriber subscriber = context.getBean("subscriber", Subscriber.class);
+                Publisher publisher = context.getBean("publisher", Publisher.class);
+                return new SimControllablePump(subscriber, publisher, eventLoop);
+        }
+    	
+    	
+    }
+
 
 }
